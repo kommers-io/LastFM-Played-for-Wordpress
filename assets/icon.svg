@@ -1,0 +1,30 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d51007;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b00d06;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <!-- Tabler Icon: vinyl (music disc) -->
+  <g transform="translate(128, 128) scale(3.5)" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer circle (vinyl record) -->
+    <circle cx="0" cy="0" r="22"/>
+
+    <!-- Middle grooves -->
+    <circle cx="0" cy="0" r="16"/>
+
+    <!-- Inner circle (label) -->
+    <circle cx="0" cy="0" r="10" fill="#ffffff" fill-opacity="0.2"/>
+
+    <!-- Center hole -->
+    <circle cx="0" cy="0" r="3" fill="#d51007"/>
+
+    <!-- Grooves detail lines -->
+    <circle cx="0" cy="0" r="19" opacity="0.4"/>
+    <circle cx="0" cy="0" r="13" opacity="0.4"/>
+  </g>
+</svg>
