@@ -3,7 +3,7 @@
  * Plugin Name: Last.FM Recently Played for WordPress
  * Plugin URI: https://kommers.io
  * Description: Display your recently played tracks from Last.FM in a clean, responsive widget. Not affiliated with Last.FM.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: KOMMERS GmbH
  * Author URI: https://kommers.io
  * License: MIT
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LASTFM_PLAYED_VERSION', '1.0.1' );
+define( 'LASTFM_PLAYED_VERSION', '1.1.0' );
 define( 'LASTFM_PLAYED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'LASTFM_PLAYED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'LASTFM_PLAYED_DEFAULT_API_KEY', 'b3f34d8652bf87d8d1dcbfa5c53d245d' );
@@ -270,7 +270,7 @@ class LastFM_Played_Widget extends WP_Widget {
 		return $instance;
 	}
 
-	private function get_lastfm_user_info( string $username, string $api_key ) {
+	public function get_lastfm_user_info( string $username, string $api_key ) {
 		$cache_key = 'lastfm_user_' . md5( $username );
 		$cached    = get_transient( $cache_key );
 
@@ -312,7 +312,7 @@ class LastFM_Played_Widget extends WP_Widget {
 		return $data;
 	}
 
-	private function get_lastfm_recent_tracks( string $username, string $api_key, int $limit ) {
+	public function get_lastfm_recent_tracks( string $username, string $api_key, int $limit ) {
 		$cache_key = 'lastfm_tracks_' . md5( $username . $limit );
 		$cached    = get_transient( $cache_key );
 
@@ -355,7 +355,7 @@ class LastFM_Played_Widget extends WP_Widget {
 		return $data;
 	}
 
-	private function display_user_info( array $user_data ): void {
+	public function display_user_info( array $user_data ): void {
 		if ( empty( $user_data['user'] ) ) {
 			return;
 		}
@@ -399,7 +399,7 @@ class LastFM_Played_Widget extends WP_Widget {
 		<?php
 	}
 
-	private function display_tracks( array $tracks_data ): void {
+	public function display_tracks( array $tracks_data ): void {
 		if ( empty( $tracks_data['recenttracks']['track'] ) ) {
 			return;
 		}
@@ -448,6 +448,63 @@ class LastFM_Played_Widget extends WP_Widget {
 		}
 	}
 }
+
+function lastfm_get_tracks( string $username, int $count = 5, bool $show_user = false ): string {
+	$api_key = get_option( 'lastfm_played_api_key', LASTFM_PLAYED_DEFAULT_API_KEY );
+	if ( empty( $api_key ) ) {
+		$api_key = LASTFM_PLAYED_DEFAULT_API_KEY;
+	}
+
+	$widget = new LastFM_Played_Widget();
+	$count = max( 1, min( 50, $count ) );
+
+	ob_start();
+
+	echo '<div class="lastfm-played-widget">';
+
+	if ( $show_user ) {
+		$user_data = $widget->get_lastfm_user_info( $username, $api_key );
+		if ( ! is_wp_error( $user_data ) ) {
+			$widget->display_user_info( $user_data );
+		}
+	}
+
+	$tracks = $widget->get_lastfm_recent_tracks( $username, $api_key, $count );
+	if ( ! is_wp_error( $tracks ) && ! empty( $tracks ) && is_array( $tracks ) ) {
+		$widget->display_tracks( $tracks );
+	}
+
+	echo '</div>';
+
+	return ob_get_clean();
+}
+
+function lastfm_display_tracks( string $username, int $count = 5, bool $show_user = false ): void {
+	echo lastfm_get_tracks( $username, $count, $show_user );
+}
+
+function lastfm_shortcode( $atts ): string {
+	$atts = shortcode_atts(
+		array(
+			'user'      => '',
+			'count'     => 5,
+			'showuser'  => 'true',
+		),
+		$atts,
+		'lastfm_tracks'
+	);
+
+	if ( empty( $atts['user'] ) ) {
+		return '<p>' . esc_html__( 'Please specify a Last.FM username using the "user" parameter.', 'lastfm-played-wp' ) . '</p>';
+	}
+
+	return lastfm_get_tracks(
+		sanitize_text_field( $atts['user'] ),
+		absint( $atts['count'] ),
+		filter_var( $atts['showuser'], FILTER_VALIDATE_BOOLEAN )
+	);
+}
+add_shortcode( 'lastfm_tracks', 'lastfm_shortcode' );
 
 function lastfm_played_enqueue_styles(): void {
 	wp_enqueue_style(

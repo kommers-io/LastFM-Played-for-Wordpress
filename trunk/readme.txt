@@ -16,7 +16,9 @@ Last.FM Recently Played is a modern, secure WordPress plugin that displays your 
 
 **Key Features:**
 
-* 🎵 Display recent Last.FM scrobbles in a widget
+* 🎵 Display recent Last.FM scrobbles in a widget, shortcode, or template function
+* 📝 **Shortcode**: Use `[lastfm_tracks user="username"]` in posts/pages
+* 🎨 **Template Function**: Use `lastfm_display_tracks()` in theme files
 * 🔒 Secure API key storage in WordPress settings
 * ⚡ Built-in caching for optimal performance
 * 📱 Responsive design with mobile support
@@ -42,9 +44,18 @@ Last.FM Recently Played is a modern, secure WordPress plugin that displays your 
 
 1. Upload the plugin files to `/wp-content/plugins/lastfm-played-wp/` or install via the WordPress admin panel
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Appearance > Widgets and add the "Last.FM Recently Played" widget to your sidebar
-4. Configure the widget with your Last.FM username and number of tracks to display
-5. (Optional) Go to Settings > Last.FM Settings to configure your own API key for better performance
+3. (Optional) Go to Settings > Last.FM Settings to configure your own API key for better performance
+
+**Using the Widget:**
+1. Go to Appearance > Widgets
+2. Add the "Last.FM Recently Played" widget to your sidebar
+3. Configure with your Last.FM username and preferences
+
+**Using Shortcode:**
+Add `[lastfm_tracks user="your_username"]` to any post or page
+
+**Using Template Function:**
+Add `<?php lastfm_display_tracks('your_username'); ?>` to your theme files
 
 **Getting Your Own API Key (Optional but Recommended):**
 
@@ -70,9 +81,38 @@ Visit https://www.last.fm/api/account/create to create a free API account. You'l
 
 The widget caches user data for 1 hour and track data for 5 minutes to improve performance and respect Last.FM's API rate limits. When a track is currently playing, it will show "Now playing..." in real-time.
 
+= How do I use the shortcode? =
+
+Add this to any post or page:
+`[lastfm_tracks user="your_username"]`
+
+Optional parameters:
+* `count` - Number of tracks (default: 5, max: 50)
+* `showuser` - Show user info (default: true)
+
+Examples:
+* `[lastfm_tracks user="johndoe" count="10"]`
+* `[lastfm_tracks user="johndoe" count="3" showuser="false"]`
+
+= How do I use the template function? =
+
+Add this to your theme files (header.php, sidebar.php, etc.):
+
+`<?php if ( function_exists( 'lastfm_display_tracks' ) ) {
+    lastfm_display_tracks( 'your_username', 5, true );
+} ?>`
+
+Parameters:
+1. Username (required)
+2. Number of tracks (optional, default: 5)
+3. Show user info (optional, default: false)
+
 = Can I hide the user profile information? =
 
 Yes! In the widget settings, simply uncheck "Show user profile information" to display only the track list without the user's profile picture, name, and play count.
+
+For shortcode: Use `showuser="false"`
+For template function: Set third parameter to `false`
 
 = Can I customize the styling? =
 
@@ -108,6 +148,15 @@ https://github.com/kommers-io/LastFM-Played-for-Wordpress/issues
 3. Widget configuration panel
 
 == Changelog ==
+
+= 1.1.0 - 2025-11-10 =
+**New Feature: Shortcode and Template Function Support**
+
+* Added: `[lastfm_tracks]` shortcode for use in posts and pages
+* Added: `lastfm_display_tracks()` template function for theme integration
+* Added: `lastfm_get_tracks()` helper function that returns HTML
+* Feature request fulfilled from 2016 - display tracks without widgets
+* All functions support custom track count and show/hide user options
 
 = 1.0.1 - 2025-11-10 =
 **Critical fix for widget compatibility**
